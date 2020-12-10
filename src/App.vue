@@ -2,9 +2,15 @@
   <v-app>
     <NavigationBar @toggleNavigationDraver="showNavDraver = !showNavDraver" />
     <NavigationDrawer :show="showNavDraver"/>
+    
+    <!-- Sizes your content based upon application components -->
     <v-main>
-     <router-view></router-view>
+      <!-- Provides the application the proper gutter -->
+      <v-container fluid class="mx-12">
+        <router-view></router-view>
+      </v-container>
     </v-main>
+    
   </v-app>
 </template>
 
