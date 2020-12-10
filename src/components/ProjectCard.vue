@@ -10,11 +10,15 @@
                 <v-layout row >
                     <v-flex xs12 md3>
                         <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]" >Project name</div>
-                        <div>{{ project1.getName() }}</div>
+                        <div>{{ project.name }}</div>
                     </v-flex>
                     <v-flex xs12 md3>
                         <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Project description</div>
-                        <div>{{ project1.getDescription() }}</div>
+                        <div>{{ project.description }}</div>
+                    </v-flex>
+                    <v-flex xs12 md3>
+                        <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Created</div>
+                        <div>{{ formatDate(project.created) }}</div>
                     </v-flex>
                     <v-spacer></v-spacer>
                     <v-flex md3 class="d-flex align-center justify-center">
@@ -61,7 +65,7 @@
             <div v-for="subproject in project.subprojects" :key="subproject.id">
                 <Project :project="subproject"/>
             </div>
-            <AddProjectCard/>
+            <AddProjectCard :parentProject="project"/>
         </div>
     </div>
 
@@ -70,14 +74,13 @@
 <script>
 import AddProjectCard from "@/components/AddProjectCard.vue"
 
-import { ProjectModel } from "@/domain/ProjectModel"
+// import { ProjectModel } from "@/domain/ProjectModel"
 
 export default {
     name: "Project",
     components: { AddProjectCard },
     props: ['project'],
     data: () => ({
-        project1: new ProjectModel("test", "asdasd"),
         showSubItems: false,
         presentation: {
             progress: 0,
@@ -92,7 +95,7 @@ export default {
             }
         },
         calcProgress(){
-            this.presentation.progress = 30;
+            this.presentation.progress = 60;
         },
         calcColor(){
             const between = function(x, min, max){
@@ -114,6 +117,10 @@ export default {
                 this.presentation.color = "green";
             }
         },
+        formatDate(created){
+            let date = new Date(created);
+            return `${date.getDate()}-${date.getMonth()}-${date.getYear()} ${date.getHours()}:${date.getMinutes()}`
+        },
 
         onEdit(){
             console.log(`onEdit, project.id=${this.project.id}`);
@@ -128,6 +135,7 @@ export default {
         }
     },
     mounted(){
+        console.log(`project: ${this.project}`)
         this.calcProgress();
         this.calcColor();
     }
