@@ -10,11 +10,11 @@
                 <v-layout row >
                     <v-flex xs12 md3>
                         <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]" >Project name</div>
-                        <div>{{ project.name }}</div>
+                        <div>{{ project1.getName() }}</div>
                     </v-flex>
                     <v-flex xs12 md3>
                         <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Project description</div>
-                        <div>{{ project.description }}</div>
+                        <div>{{ project1.getDescription() }}</div>
                     </v-flex>
                     <v-spacer></v-spacer>
                     <v-flex md3 class="d-flex align-center justify-center">
@@ -70,11 +70,14 @@
 <script>
 import AddProjectCard from "@/components/AddProjectCard.vue"
 
+import { ProjectModel } from "@/domain/ProjectModel"
+
 export default {
     name: "Project",
     components: { AddProjectCard },
     props: ['project'],
     data: () => ({
+        project1: new ProjectModel("test", "asdasd"),
         showSubItems: false,
         presentation: {
             progress: 0,
@@ -89,7 +92,7 @@ export default {
             }
         },
         calcProgress(){
-            this.presentation.progress = 80;
+            this.presentation.progress = 30;
         },
         calcColor(){
             const between = function(x, min, max){

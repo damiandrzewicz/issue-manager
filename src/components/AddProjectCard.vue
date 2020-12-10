@@ -27,11 +27,12 @@
 export default {
     name: "AddProjectCard",
     props: [],
+    data: () => ({}),
     methods: {
         onAddProject(){
             console.log(`onAddProject, adding subproject X to project.id=`);
             //todo emit event
-            // this.emit('addProjectEvent');
+            this.emit('addProjectEvent');
         }
     }
 }
