@@ -61,23 +61,27 @@
             </v-card>
          </v-hover>
 
-        <div v-if="project.subprojects && showSubItems" class="pl-5">
-            <div v-for="subproject in project.subprojects" :key="subproject.id">
-                <Project :project="subproject"/>
+        <div v-if="showSubItems" class="pl-5">
+            <div >
+                <div v-for="subproject in getSubProjects(project.id)" :key="subproject.id">
+                    <ProjectCard :project="subproject"/>
+                </div>
             </div>
-            <AddProjectCard :parentProject="project"/>
-        </div>
+            <AddProjectCard :parentId="project.id"/>
+        </div >
+
     </div>
 
 </template>
 
 <script>
 import AddProjectCard from "@/components/AddProjectCard.vue"
+import { mapGetters } from 'vuex'
 
 // import { ProjectModel } from "@/domain/ProjectModel"
 
 export default {
-    name: "Project",
+    name: "ProjectCard",
     components: { AddProjectCard },
     props: ['project'],
     data: () => ({
@@ -88,11 +92,14 @@ export default {
         }
        
     }),
+    computed: {
+        ...mapGetters("projects", {
+            getSubProjects: "getSubProjects"
+        })
+    },
     methods: {
         toggleSubitemsVisibility(){
-            if(this.project.subprojects){
-                this.showSubItems = ! this.showSubItems 
-            }
+            this.showSubItems = ! this.showSubItems 
         },
         calcProgress(){
             this.presentation.progress = 60;

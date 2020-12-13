@@ -1,15 +1,16 @@
-export class ProjectModel{
+export default class ProjectModel{
     id;
+    parentId;
     name;
     description;
     created;
-    subprojects;
 
-    constructor(){
-        this.subprojects = [];
-    }
-
-    assign(data){
+    constructor(data = {}){
+        this.id = null;
+        this.parentId = null;
+        this.name = null;
+        this.description = null;
+        this.created = null;
         Object.assign(this, data);
     }
 }

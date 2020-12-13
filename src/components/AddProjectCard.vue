@@ -24,36 +24,23 @@
 </template>
 
 <script>
-import { ProjectModel } from "@/domain/ProjectModel"
+import ProjectModel from "@/domain/ProjectModel"
 
 export default {
     name: "AddProjectCard",
-    props: ['parentProject'],
+    props: ['parentId'],
     data: () => ({
         project: new ProjectModel(null),
     }),
     methods: {
         onAddProject(){
-            //console.log()
             this.$refs.form.validate();
-            
-            //todo emit event
-            this.project.created = Date.now();
+            this.project.parentId = this.$props.parentId;
 
             console.log(`onAddProject, adding subproject=${ JSON.stringify(this.project) } to project.id=${this.$props.parentProject ? this.$props.parentProject.id : 'root'}`);
 
-            let date = new Date(this.project.created);
+            this.$store.dispatch("projects/addProject", this.project);
 
-            let strr = `${date.getDate()}-${date.getMonth()}-${date.getYear()}`;
-
-            console.log(`date: ${ strr}`)
-
-            if(this.$props.parentProject){
-                this.$props.parentProject.subprojects.push(this.project);
-            }
-            
-
-            this.$emit('addProjectEvent');
             this.project = new ProjectModel(null);
             this.$refs.form.reset();
         },
