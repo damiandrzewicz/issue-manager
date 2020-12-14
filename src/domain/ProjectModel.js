@@ -5,12 +5,16 @@ export default class ProjectModel{
     description;
     created;
 
-    constructor(data = {}){
+    constructor(data = null){
         this.id = null;
         this.parentId = null;
         this.name = null;
         this.description = null;
         this.created = null;
-        Object.assign(this, data);
+
+        if(data){
+            Object.assign(this, data);
+        }
+        
     }
 }

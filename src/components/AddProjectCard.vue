@@ -5,14 +5,14 @@
             <v-form ref="form">
                 <v-layout row >
                     <v-flex class="pr-2" xs12 md3>
-                        <v-text-field v-model="project.name" required label="Enter Project Name"></v-text-field>
+                        <v-text-field v-model="name" required label="Enter Project Name"></v-text-field>
                     </v-flex>
                     <v-flex class="pr-2" xs12 md3>
-                        <v-text-field v-model="project.description" label="Enter Project Description"></v-text-field>
+                        <v-text-field v-model="description" label="Enter Project Description"></v-text-field>
                     </v-flex>
                     <v-spacer></v-spacer>
                     <v-flex md3 class="d-flex justify-center align-center grey--text">
-                        <v-btn :disabled="!project.name" @click="onAddProject">
+                        <v-btn :disabled="!name" @click="onAddProject">
                             Add Project
                             <v-icon class="mx-3">mdi-folder-plus</v-icon>
                         </v-btn>
@@ -28,20 +28,36 @@ import ProjectModel from "@/domain/ProjectModel"
 
 export default {
     name: "AddProjectCard",
-    props: ['parentId'],
+    props: {
+        parentId: {
+            default: null,
+            type: Number
+        }
+    },
     data: () => ({
-        project: new ProjectModel(null),
+        name: null,
+        description: null
     }),
     methods: {
         onAddProject(){
             this.$refs.form.validate();
-            this.project.parentId = this.$props.parentId;
 
-            console.log(`onAddProject, adding subproject=${ JSON.stringify(this.project) } to project.id=${this.$props.parentProject ? this.$props.parentProject.id : 'root'}`);
+            let project = new ProjectModel();
+            project.name = this.name;
+            if(this.description){
+                project.description = this.description;
+                console.log(this.project.description);
+            }
 
-            this.$store.dispatch("projects/addProject", this.project);
+            if(this.$props.parentId){
+                project.parentId = this.$props.parentId;
+            }
+            
+            
+            console.log(`onAddProject: ${project}`);
 
-            this.project = new ProjectModel(null);
+            this.$store.dispatch("projects/addProject", project);
+
             this.$refs.form.reset();
         },
     }

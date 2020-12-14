@@ -16,12 +16,16 @@
                         <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Project description</div>
                         <div>{{ project.description }}</div>
                     </v-flex>
-                    <v-flex xs12 md3>
+                    <v-flex xs12 md2>
                         <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Created</div>
                         <div>{{ formatDate(project.created) }}</div>
                     </v-flex>
+                    <v-flex xs12 md2>
+                        <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Subprojects</div>
+                        <div>{{ getSubProjectsCount(project.id) }}</div>
+                    </v-flex>
                     <v-spacer></v-spacer>
-                    <v-flex md3 class="d-flex align-center justify-center">
+                    <v-flex md2 class="d-flex align-center justify-center">
                         <v-tooltip top>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn 
@@ -78,12 +82,16 @@
 import AddProjectCard from "@/components/AddProjectCard.vue"
 import { mapGetters } from 'vuex'
 
-// import { ProjectModel } from "@/domain/ProjectModel"
+import ProjectModel from "@/domain/ProjectModel"
 
 export default {
     name: "ProjectCard",
     components: { AddProjectCard },
-    props: ['project'],
+    props: {
+        project: {
+            type: ProjectModel
+        }
+    },
     data: () => ({
         showSubItems: false,
         presentation: {
@@ -93,9 +101,10 @@ export default {
        
     }),
     computed: {
-        ...mapGetters("projects", {
-            getSubProjects: "getSubProjects"
-        })
+        ...mapGetters("projects", [
+            "getSubProjects",
+            "getSubProjectsCount"
+            ])
     },
     methods: {
         toggleSubitemsVisibility(){
@@ -133,16 +142,13 @@ export default {
             console.log(`onEdit, project.id=${this.project.id}`);
         },
         onDelete(){
-            console.log(`onDelete, project.id=${this.project.id}`);
+            this.$log.debug(this.project.id);
+            this.$store.dispatch("projects/deleteProjectWithDependencies", this.project.id);
         },
-        onAddProject(){
-            console.log("on add project");
-            //todo emit event
-            // this.emit('addProjectEvent');
-        }
+        
     },
-    mounted(){
-        console.log(`project: ${this.project}`)
+    created(){
+        this.$log.debug(`Project card for project.id=${this.project.id}`);
         this.calcProgress();
         this.calcColor();
     }

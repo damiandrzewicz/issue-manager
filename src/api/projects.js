@@ -1,38 +1,32 @@
 import axios from 'axios';
 import Database from "@/api/database"
-import ProjectModel from "@/domain/ProjectModel"
 
-class Projects extends Database{
+class ProjectsAPI extends Database{
 
-    async getAllProjects(cb, errorCb){
-        let projectsArray = [];
-        try{
-            let res = await axios.get(`${this._uri}/${this._projectsCollectionName}`);
-            let data =  res.data;
-            console.log(data);
-
-            data.forEach(element => {
-                projectsArray.push(new ProjectModel(element));
-            });
-            cb(projectsArray);
-            
-        }catch(err){
-            console.log(err);
-            errorCb(err);
-        }
+    async getAllProjects(){
+        return axios.get(`${this._uri}/${this._projectsCollectionName}`)
+            .then(response => response.data);
     }
 
-    async addProject(project, cb, errorCB){
-        try{
-            let res = await axios.post(`${this._uri}/${this._projectsCollectionName}`, project);
-            let data =  res.data;
-            cb(project);
-            console.log(data);
-        }catch(err){
-            console.log(err);
-            errorCB(err);
-        }
+    async addProject(project){
+        return axios.post(`${this._uri}/${this._projectsCollectionName}`, project)
+            .then(response => response.data); 
+    }
+
+    async deleteProject(id){
+        return axios.delete(`${this._uri}/${this._projectsCollectionName}/${id}`)
+            .then(response => response.data);
+    }
+// eslint-disable-next-line no-unused-vars
+    async deleteProjects(ids){
+        let promises = [];
+        ids.forEach(id => {
+            promises.push(axios.delete(`${this._uri}/${this._projectsCollectionName}/${id}`));
+        });
+
+        return axios.all(promises)
+            .then(axios.spread((...responses) => responses ));
     }
 }
 
-export default new Projects();
+export default new ProjectsAPI();

@@ -27,7 +27,7 @@
 <script>
 export default {
     name: "NavigationDrawer",
-    props: ['show'],
+    props: ['showNavigationDraver'],
     data: () => ({
         links: [
             { text: "Dashboard", icon: "mdi-view-dashboard", to: { name: "Dashboard" } },
@@ -35,7 +35,17 @@ export default {
             { text: "Activity", icon: "mdi-chart-line-variant", to: { name: "Activity" }},
 
         ]
-    })
+    }),
+    computed: {
+        show: {
+            get() {
+                return this.$props.showNavigationDraver;
+            },
+            set(newVal){
+                this.$emit("update:showNavigationDraver", newVal);
+            }
+        }
+    }
 }
 </script>
 

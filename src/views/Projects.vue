@@ -15,7 +15,7 @@
 import ProjectCard from "@/components/ProjectCard.vue"
 import AddProjectCard from "@/components/AddProjectCard.vue"
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 
 
 export default {
@@ -29,9 +29,8 @@ export default {
             projects: "getRootProjects"
         })
     },
-    methods: mapActions("projects", []),
     created(){
-        this.$store.dispatch("projects/getAllProjects");
+        this.$log.debug("[Projects] component created")
     }
 
 }   

@@ -1,7 +1,7 @@
 <template>
   <v-app>
-    <NavigationBar @toggleNavigationDraver="showNavDraver = !showNavDraver" />
-    <NavigationDrawer :show="showNavDraver"/>
+    <NavigationBar @toggleNavigationDraver="toggleNavDraver" />
+    <NavigationDrawer :showNavigationDraver="showNavDraver" @update:showNavigationDraver="updateNavDrawer"/>
     
     <!-- Sizes your content based upon application components -->
     <v-main>
@@ -29,5 +29,17 @@ export default {
   data: () => ({
       showNavDraver: false
   }),
+  methods: {
+    toggleNavDraver(){
+      this.showNavDraver = !this.showNavDraver;
+    },
+    updateNavDrawer(val){
+      this.showNavDraver = val;
+    }
+  },
+  created() {
+    this.$log.info('App created')
+    this.$store.dispatch("projects/getAllProjects");
+  }
 };
 </script>
