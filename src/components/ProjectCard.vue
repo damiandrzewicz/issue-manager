@@ -1,8 +1,8 @@
 <template>
     <div >
         <EditProjectDialog :show="showEditdialog" :project="project" @setShow="handleSetShowEditdialog"/>
-        <v-hover v-slot="{ hover }">
-            <v-card flat :class="['px-5 py-1 ma-1',{ 'on-hover': hover, 'card-opened secondary': showSubItems}]" 
+        <v-hover v-slot="{ hover } ">
+            <v-card flat :class="['px-5 py-1 ma-1',{'on-hover': hover,  'card-opened secondary': showSubItems}]" 
             
                 :elevation="hover ? 16 : 2" 
                 @click="toggleSubitemsVisibility" >
@@ -11,17 +11,19 @@
                         <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]" >Project name</div>
                         <div>{{ project.name }}</div>
                     </v-flex>
-                    <v-flex xs12 md3>
-                        <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Project description</div>
-                        <div>{{ project.description }}</div>
-                    </v-flex>
-                    <v-flex xs12 md2>
-                        <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Created</div>
-                        <div>{{ formatDate(project.created) }}</div>
-                    </v-flex>
-                    <v-flex xs12 md2>
+
+                    <v-tooltip bottom :disabled="!isDescriptionTooLong ">
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-flex xs12 md3  v-bind="attrs" v-on="on">
+                                <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Project description</div>
+                                <div>{{ turncateDescription }}</div>
+                            </v-flex>
+                        </template>
+                        <span>{{ project.description }}</span>
+                    </v-tooltip>
+                    <v-flex xs12 md2 >
                         <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Subprojects</div>
-                        <div>{{ getSubProjectsCount(project.id) }}</div>
+                        <div>{{ getSubProjectsCountForcurrentProject }}</div>
                     </v-flex>
                     <v-spacer></v-spacer>
                     <v-flex md2 class="d-flex align-center justify-center">
@@ -54,7 +56,7 @@
                                     <v-icon>mdi-delete</v-icon>
                                 </v-btn>
                             </template>
-                            <span>Edit project</span>
+                            <span>Delete project</span>
                         </v-tooltip>
                     </v-flex>
                 </v-layout>
@@ -105,7 +107,22 @@ export default {
         ...mapGetters("projects", [
             "getSubProjects",
             "getSubProjectsCount"
-            ])
+        ]),
+        getSubProjectsCountForcurrentProject(){
+            return this.getSubProjectsCount(this.project.id);
+        },
+        isDescriptionTooLong(){
+            const description = this.$props.project.description;
+            return (description && description.length > 30);
+        },
+        turncateDescription(){
+            const description = this.$props.project.description;
+            if(this.isDescriptionTooLong){
+                return this.$props.project.description.substring(0, 30) + "...";
+            }else{
+                return description;
+            }
+        }
     },
     methods: {
         toggleSubitemsVisibility(){
@@ -138,6 +155,7 @@ export default {
             let date = new Date(created);
             return `${date.getDate()}-${date.getMonth()}-${date.getYear()} ${date.getHours()}:${date.getMinutes()}`
         },
+
 
         onEdit(){
             console.log(`onEdit, project.id=${this.project.id}`);

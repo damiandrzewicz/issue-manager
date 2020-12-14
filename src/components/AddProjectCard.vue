@@ -46,7 +46,7 @@ export default {
             project.name = this.name;
             if(this.description){
                 project.description = this.description;
-                console.log(this.project.description);
+                console.log(project.description);
             }
 
             if(this.$props.parentId){

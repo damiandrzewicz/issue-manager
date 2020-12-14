@@ -11,11 +11,11 @@
           </v-card-title>
           <v-card-text>
             <v-text-field required v-model="name" label="Project name"></v-text-field>
-            <v-text-field required v-model="description" label="Project description"></v-text-field>
+            <v-textarea v-model="description" label="Project description"></v-textarea>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn text @click="onOk">Ok</v-btn>
+            <v-btn text @click="onOk" :disabled="!name">Ok</v-btn>
             <v-btn text @click="onCancel">Cancel</v-btn>
           </v-card-actions>
         </v-card>
@@ -38,8 +38,8 @@ export default {
   },
   data(){
     return{
-      name: "",
-      description: ""
+      name: null,
+      description: null
     }
   },
   computed: {
@@ -58,6 +58,10 @@ export default {
   },
   methods: {
     onOk(){
+      let project = new ProjectModel(this.$props.project);
+      project.name = this.name;
+      project.description = this.description;
+      this.$store.dispatch("projects/updateProject", project);
       this.showDialog = false;
     },
     onCancel(){

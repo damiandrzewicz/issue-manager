@@ -15,7 +15,7 @@ const getters = {
     },
     getSubProjects: state => parentId => {
         let subprojects = state.all.filter(project => project.parentId === parentId);
-        Vue.$log.debug(`getRootProjects, loaded subprojects for parent project.id=${parentId}: ${JSON.stringify(subprojects)}`);
+        Vue.$log.debug(`getSubProjects, loaded subprojects for parent project.id=${parentId}: ${JSON.stringify(subprojects)}`);
         return subprojects;
     },
     getSubProjectsCount: (state, getters) => parentId => {
@@ -80,6 +80,15 @@ const actions = {
         ids = ids.concat(getters.getAllSubProjectsIds(id));
         Vue.$log.debug(`deleteProjectWithDependencies: ids = ${ids}`)
         dispatch("deleteProjects", ids)
+    },
+    updateProject({commit}, project){
+        Vue.$log.debug(`updateProject: id=${JSON.stringify(project)}`);
+        projectsApi.updateProject(project)
+            .then(data => {
+                 Vue.$log.debug(`updateProject: data=${JSON.stringify(data)}`)
+                commit("updateProject", new ProjectModel(data));
+            })
+            .catch(err => Vue.$log.error(err));
     }
 };
 
@@ -92,6 +101,10 @@ const mutations = {
     },
     deleteProject(state, id){
         state.all = state.all.filter(item => item.id !== id);
+    },
+    updateProject(state, project){
+        let foundProject = state.all.find(item => item.id === project.id);
+        Object.assign(foundProject, project);
     }
 };
 

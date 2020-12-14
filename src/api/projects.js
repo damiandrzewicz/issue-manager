@@ -27,6 +27,11 @@ class ProjectsAPI extends Database{
         return axios.all(promises)
             .then(axios.spread((...responses) => responses ));
     }
+
+    async updateProject(project){
+        return axios.put(`${this._uri}/${this._projectsCollectionName}/${project.id}`, project)
+            .then(response => response.data);
+    }
 }
 
 export default new ProjectsAPI();
