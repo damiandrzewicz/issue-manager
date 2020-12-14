@@ -1,7 +1,6 @@
 <template>
     <div >
-        <!-- :color="showSubItems ? 'secondary' : ''" -->
-        
+        <EditProjectDialog :show="showEditdialog" :project="project" @setShow="handleSetShowEditdialog"/>
         <v-hover v-slot="{ hover }">
             <v-card flat :class="['px-5 py-1 ma-1',{ 'on-hover': hover, 'card-opened secondary': showSubItems}]" 
             
@@ -80,13 +79,14 @@
 
 <script>
 import AddProjectCard from "@/components/AddProjectCard.vue"
+import EditProjectDialog from "@/components/EditProjectDialog.vue"
 import { mapGetters } from 'vuex'
 
 import ProjectModel from "@/domain/ProjectModel"
 
 export default {
     name: "ProjectCard",
-    components: { AddProjectCard },
+    components: { AddProjectCard, EditProjectDialog },
     props: {
         project: {
             type: ProjectModel
@@ -94,6 +94,7 @@ export default {
     },
     data: () => ({
         showSubItems: false,
+        showEditdialog: false,
         presentation: {
             progress: 0,
             color: 'blue'
@@ -140,12 +141,15 @@ export default {
 
         onEdit(){
             console.log(`onEdit, project.id=${this.project.id}`);
+            this.showEditdialog = true;
         },
         onDelete(){
             this.$log.debug(this.project.id);
             this.$store.dispatch("projects/deleteProjectWithDependencies", this.project.id);
         },
-        
+        handleSetShowEditdialog(value){
+            this.showEditdialog = value;
+        }
     },
     created(){
         this.$log.debug(`Project card for project.id=${this.project.id}`);
