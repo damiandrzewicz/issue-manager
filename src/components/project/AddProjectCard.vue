@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import ProjectModel from "@/domain/ProjectModel"
 
 export default {
@@ -39,6 +40,9 @@ export default {
         description: null
     }),
     methods: {
+        ...mapGetters("projects", [
+            "getProjectById"
+        ]),
         onAddProject(){
             this.$refs.form.validate();
 
@@ -49,14 +53,10 @@ export default {
                 console.log(project.description);
             }
 
-            if(this.$props.parentId){
-                project.parentId = this.$props.parentId;
-            }
-            
-            
-            console.log(`onAddProject: ${project}`);
 
-            this.$store.dispatch("projects/addProject", project);
+            console.log(`onAddProject: ${project}`);
+            
+            this.$store.dispatch("projects/addProject", {project, parentId: this.$props.parentId});
 
             this.$refs.form.reset();
         },

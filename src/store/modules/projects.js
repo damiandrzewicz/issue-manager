@@ -9,55 +9,65 @@ const state = () => ({
 
 // getters
 const getters = {
+    getProjects(state){
+        Vue.$log.debug("getProjects");
+        return state.all;
+    },
+    getProjectById: state => (id) => {
+        Vue.$log.debug("getProjectById");
+        return state.all.find(p => p.id === id);
+    },
     getRootProjects(state){
-        Vue.$log.debug("getRootProjects");
-        return state.all.filter(project => {return !project.parentId});
+        let rootProjects = [];
+        state.all.forEach(item => {
+            let found = state.all.filter(el => el.subprojectIds.includes(item.id));
+            if(!found.length){
+                rootProjects.push(item);
+            }
+        })
+        return rootProjects;
     },
-    getSubProjects: state => parentId => {
-        let subprojects = state.all.filter(project => project.parentId === parentId);
-        Vue.$log.debug(`getSubProjects, loaded subprojects for parent project.id=${parentId}: ${JSON.stringify(subprojects)}`);
-        return subprojects;
-    },
-    getSubProjectsCount: (state, getters) => parentId => {
-        return getters.getSubProjects(parentId).length;
-    },
-    getAllSubProjectsIds: (state, getters) => parentId => {
+    getProjectAllSubprojectsRecursively: (state, getters) => id => {
         let ids = [];
-        let subprojects = getters.getSubProjects(parentId)
-        Vue.$log.debug(`subprojects: ${JSON.stringify(subprojects)}`);
-        subprojects.forEach(project => {
-                ids.push(project.id);
-                ids = ids.concat(getters.getAllSubProjectsIds(project.id));
-            })
-        Vue.$log.debug(`ids: ${ids}`);
+        let rootProject = getters.getProjectById(id);
+        ids = ids.concat(rootProject.id);
+        rootProject.subprojectIds.forEach(subprojectId => {
+            ids = ids.concat(getters.getProjectAllSubprojectsRecursively(subprojectId));
+        });
         return ids;
-    },
-
+    }
 }
 
 const actions = {
-    getAllProjects({commit}){
-        projectsApi.getAllProjects()
+    getProjects({commit}){
+        Vue.$log.debug(`action:getProjects`);
+        projectsApi.getProjects()
             .then(data => {
-                let projects =[];
-                data.forEach(element => {
-                    projects.push(new ProjectModel(element));
-                });
-                Vue.$log.debug(`loaded all projects: ${JSON.stringify(projects)}`);
+                let projects = [];
+                data.forEach(i => projects.push(new ProjectModel(i)));
                 commit("setProjects", projects);
+                Vue.$log.debug(projects);
             })
             .catch(err => Vue.$log.error(err));
     },
-    addProject({commit}, project){
-        project.created = new Date();
-        projectsApi.addProject(project)
+    addProject({commit, dispatch, getters}, payload){
+        Vue.$log.debug(`addProject: payload=${JSON.stringify(payload)}`);
+        payload.project.created = new Date();
+        projectsApi.addProject(payload.project)
             .then(data => {
                 let project = new ProjectModel(data);
                 Vue.$log.debug(`new project: ${JSON.stringify(project)}`)
                 commit("appendProject", project);
+
+                //update parent project
+                if(payload.parentId){
+                    Vue.$log.debug(`addProject: update parentId=${payload.parentId}`);
+                    let parent = getters.getProjectById(payload.parentId).deepCopy();
+                    parent.subprojectIds.push(project.id);
+                    dispatch("updateProject", parent);
+                }
             })
     },
-    // eslint-disable-next-line no-unused-vars
     deleteProject({commit}, id){
         Vue.$log.debug(`deleteProject: id=${id}`);
         projectsApi.deleteProject(id)
@@ -74,12 +84,19 @@ const actions = {
             })
             .catch(err => {Vue.$log.error(err)});
     },
-    deleteProjectWithDependencies({ dispatch, getters}, id){
-        let ids = [];
-        ids.push(id);
-        ids = ids.concat(getters.getAllSubProjectsIds(id));
-        Vue.$log.debug(`deleteProjectWithDependencies: ids = ${ids}`)
-        dispatch("deleteProjects", ids)
+    
+    deleteProjectWithDependencies({commit, dispatch, getters}, id){    // eslint-disable-line no-unused-vars
+        //find parent project and update it
+        let parentProject = getters.getProjects.find(item => item.subprojectIds.includes(id));
+        if(parentProject){
+            let parentProjectDeepCopy = parentProject.deepCopy();
+            parentProjectDeepCopy.subprojectIds = parentProject.subprojectIds.filter(item => item !== id);
+            dispatch("updateProject", parentProjectDeepCopy)
+        }
+
+        let ids = getters.getProjectAllSubprojectsRecursively(id);
+        Vue.$log.debug(`deleteProjectWithDependencies: ids=${ids}`);
+        dispatch("deleteProjects", ids);
     },
     updateProject({commit}, project){
         Vue.$log.debug(`updateProject: id=${JSON.stringify(project)}`);
@@ -103,8 +120,12 @@ const mutations = {
         state.all = state.all.filter(item => item.id !== id);
     },
     updateProject(state, project){
-        let foundProject = state.all.find(item => item.id === project.id);
-        Object.assign(foundProject, project);
+        let index = state.all.findIndex(item => item.id === project.id);
+        state.all = [
+            ...state.all.slice(0, index),
+            project,
+            ...state.all.slice(index + 1)
+        ]
     }
 };
 

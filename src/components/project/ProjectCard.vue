@@ -23,7 +23,7 @@
                     </v-tooltip>
                     <v-flex xs12 md2 >
                         <div :class="['caption', showSubItems ? 'white--text' : 'grey--text' ]">Subprojects</div>
-                        <div>{{ getSubProjectsCountForcurrentProject }}</div>
+                        <div>{{ project.subprojectIds.length }}</div>
                     </v-flex>
                     <v-spacer></v-spacer>
                     <v-flex md2 class="d-flex align-center justify-center">
@@ -68,8 +68,8 @@
 
         <div v-if="showSubItems" class="pl-5">
             <div >
-                <div v-for="subproject in getSubProjects(project.id)" :key="subproject.id">
-                    <ProjectCard :project="subproject"/>
+                <div v-for="subprojectId in project.subprojectIds" :key="subprojectId">
+                    <ProjectCard :project="getProjectById(subprojectId)"/>
                 </div>
             </div>
             <AddProjectCard :parentId="project.id"/>
@@ -80,8 +80,8 @@
 </template>
 
 <script>
-import AddProjectCard from "@/components/AddProjectCard.vue"
-import EditProjectDialog from "@/components/EditProjectDialog.vue"
+import AddProjectCard from "@/components/project/AddProjectCard.vue"
+import EditProjectDialog from "@/components/project/EditProjectDialog.vue"
 import { mapGetters } from 'vuex'
 
 import ProjectModel from "@/domain/ProjectModel"
@@ -105,12 +105,9 @@ export default {
     }),
     computed: {
         ...mapGetters("projects", [
-            "getSubProjects",
-            "getSubProjectsCount"
+            "getProjectById"
         ]),
-        getSubProjectsCountForcurrentProject(){
-            return this.getSubProjectsCount(this.project.id);
-        },
+
         isDescriptionTooLong(){
             const description = this.$props.project.description;
             return (description && description.length > 30);

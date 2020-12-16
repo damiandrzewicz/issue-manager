@@ -3,7 +3,7 @@ import Database from "@/api/database"
 
 class ProjectsAPI extends Database{
 
-    async getAllProjects(){
+    async getProjects(){
         return axios.get(`${this._uri}/${this._projectsCollectionName}`)
             .then(response => response.data);
     }
@@ -17,7 +17,7 @@ class ProjectsAPI extends Database{
         return axios.delete(`${this._uri}/${this._projectsCollectionName}/${id}`)
             .then(response => response.data);
     }
-// eslint-disable-next-line no-unused-vars
+    
     async deleteProjects(ids){
         let promises = [];
         ids.forEach(id => {

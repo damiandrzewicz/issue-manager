@@ -6,7 +6,7 @@
     <!-- Sizes your content based upon application components -->
     <v-main>
       <!-- Provides the application the proper gutter -->
-      <v-container fluid class="mx-12">
+      <v-container fluid>
         <router-view></router-view>
       </v-container>
     </v-main>
@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import NavigationBar from "@/components/NavigationBar.vue"
-import NavigationDrawer from "@/components/NavigationDrawer.vue"
+import NavigationBar from "@/components/nav/NavigationBar.vue"
+import NavigationDrawer from "@/components/nav/NavigationDrawer.vue"
 
 export default {
   name: 'App',
@@ -39,7 +39,7 @@ export default {
   },
   created() {
     this.$log.info('App created')
-    this.$store.dispatch("projects/getAllProjects");
+    this.$store.dispatch("projects/getProjects");
   }
 };
 </script>

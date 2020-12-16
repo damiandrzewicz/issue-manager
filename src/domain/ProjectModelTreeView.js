@@ -1,16 +1,14 @@
-export default class ProjectModel{
+export default class ProjectModelTreeView{
     id;
     name;
-    description;
-    created;
-    subprojectIds;
+    selected;
+    subprojects;
 
     constructor(data = null){
         this.id = null;
         this.name = null;
-        this.description = null;
-        this.created = null;
-        this.subprojectIds = [];
+        this.selected = false;
+        this.subprojects = [];
 
         if(data){
             Object.assign(this, data);
@@ -18,7 +16,7 @@ export default class ProjectModel{
     }
 
     deepCopy(){
-        let copy = new ProjectModel();
+        let copy = new ProjectModelTreeView();
         return Object.assign(copy, JSON.parse(JSON.stringify(this)));
     }
 }
