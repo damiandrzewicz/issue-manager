@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import projects from "@/store/modules/projects"
-import projectsTree from "@/store/modules/projectsTree"
+import projectStore from "@/store/modules/projectStore"
+import projectTreeStore from "@/store/modules/projectTreeStore"
+import taskStore from "@/store/modules/taskStore"
+
 
 Vue.use(Vuex);
 
@@ -10,8 +12,9 @@ const debug = process.env.NODE_ENV !== 'production'
 
 export default new Vuex.Store({
     modules: {
-        projects,
-        projectsTree
+        projectStore,
+        taskStore,
+        projectTreeStore
     },
     strict: debug
 });

@@ -6,6 +6,7 @@ export default class TaskModel{
     name;
     description;
     created;
+    started;
     closed;
     deadline;
     priority;
@@ -14,6 +15,7 @@ export default class TaskModel{
     currentPomodoro;
     currentPercent;
     externalUrl;
+    externalUrlShortcut;
     labelColor;
 
 
@@ -23,6 +25,7 @@ export default class TaskModel{
         this.name = null;
         this.description = null;
         this.created = null;
+        this.started = null,
         this.closed = null;
         this.deadline = null;
         this.priority = TaskPriorityModel.No;
@@ -31,6 +34,7 @@ export default class TaskModel{
         this.currentPomodoro = 0;
         this.currentPercent = 0;
         this.externalUrl = null;
+        this.externalUrlShortcut = null;
         this.labelColor = 'white';
 
         if(data){

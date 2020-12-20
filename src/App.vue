@@ -37,9 +37,13 @@ export default {
       this.showNavDraver = val;
     }
   },
+  mounted(){
+    this.$store.dispatch("projectStore/getProjects")
+      .then(() => this.$log.debug("data fetched"));
+  },
   created() {
     this.$log.info('App created')
-    this.$store.dispatch("projects/getProjects");
+
   }
 };
 </script>

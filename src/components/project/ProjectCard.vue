@@ -1,6 +1,6 @@
 <template>
     <div >
-        <EditProjectDialog :show="showEditdialog" :project="project" @setShow="handleSetShowEditdialog"/>
+        <EditProjectDialog :show="showEditdialog" :project="project" @setShow="onSetShowEditdialog"/>
         <v-hover v-slot="{ hover } ">
             <v-card flat :class="['px-5 py-1 ma-1',{'on-hover': hover,  'card-opened secondary': showSubItems}]" 
             
@@ -61,7 +61,7 @@
                     </v-flex>
                 </v-layout>
                 <v-layout row>
-                    <v-progress-linear :value="presentation.progress" striped height="6" :color="presentation.color"></v-progress-linear>
+                    <v-progress-linear :value="calcProgress" striped height="6" :color="calcColor"></v-progress-linear>
                 </v-layout>
             </v-card>
          </v-hover>
@@ -97,14 +97,9 @@ export default {
     data: () => ({
         showSubItems: false,
         showEditdialog: false,
-        presentation: {
-            progress: 0,
-            color: 'blue'
-        }
-       
     }),
     computed: {
-        ...mapGetters("projects", [
+        ...mapGetters("projectStore", [
             "getProjectById"
         ]),
 
@@ -119,57 +114,45 @@ export default {
             }else{
                 return description;
             }
-        }
+        },
+        calcColor(){
+            const between = function(x, min, max){return x >= min && x <= max;};
+            const v = this.calcProgress;
+            if(between(v, 0, 20)){return "red";}
+            else if(between(v, 21, 40)){return "yellow";}
+            else if(between(v, 41, 60)){return "orange";}
+            else if(between(v, 61, 80)){return "grey";}
+            else if(between(v, 81, 99)){return "blue";}
+            else{return "green";}
+        },
+        calcProgress(){
+            return 60;
+        },
+        formatDate(){
+            let date = new Date(this.project.created);
+            return `${date.getDate()}-${date.getMonth()}-${date.getYear()} ${date.getHours()}:${date.getMinutes()}`
+        },
     },
     methods: {
         toggleSubitemsVisibility(){
             this.showSubItems = ! this.showSubItems 
         },
-        calcProgress(){
-            this.presentation.progress = 60;
-        },
-        calcColor(){
-            const between = function(x, min, max){
-                return x >= min && x <= max;
-            };
-            const v = this.presentation.progress;
-            if(between(v, 0, 20)){
-                this.presentation.color = "red";
-            }else if(between(v, 21, 40)){
-                this.presentation.color = "yellow";
-            }else if(between(v, 41, 60)){
-                this.presentation.color = "orange";
-            }else if(between(v, 61, 80)){
-                this.presentation.color = "grey";
-            }else if(between(v, 81, 99)){
-                this.presentation.color = "blue";
-            }
-            else if(v == 100){
-                this.presentation.color = "green";
-            }
-        },
-        formatDate(created){
-            let date = new Date(created);
-            return `${date.getDate()}-${date.getMonth()}-${date.getYear()} ${date.getHours()}:${date.getMinutes()}`
-        },
 
-
+        // Handlers
         onEdit(){
             console.log(`onEdit, project.id=${this.project.id}`);
             this.showEditdialog = true;
         },
         onDelete(){
             this.$log.debug(this.project.id);
-            this.$store.dispatch("projects/deleteProjectWithDependencies", this.project.id);
+            this.$store.dispatch("projectStore/deleteProjectWithDependencies", this.project.id);
         },
-        handleSetShowEditdialog(value){
+        onSetShowEditdialog(value){
             this.showEditdialog = value;
         }
     },
     created(){
         this.$log.debug(`Project card for project.id=${this.project.id}`);
-        this.calcProgress();
-        this.calcColor();
     }
 }
 </script>

@@ -23,7 +23,7 @@ export default {
     components: { ProjectCard, AddProjectCard },
 
     computed: {
-        ...mapGetters("projects", [
+        ...mapGetters("projectStore", [
             "getRootProjects"
         ])
     },

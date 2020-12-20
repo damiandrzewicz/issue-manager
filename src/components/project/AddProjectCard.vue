@@ -40,7 +40,7 @@ export default {
         description: null
     }),
     methods: {
-        ...mapGetters("projects", [
+        ...mapGetters("projectsStore", [
             "getProjectById"
         ]),
         onAddProject(){
@@ -56,7 +56,7 @@ export default {
 
             console.log(`onAddProject: ${project}`);
             
-            this.$store.dispatch("projects/addProject", {project, parentId: this.$props.parentId});
+            this.$store.dispatch("projectStore/addProject", {project, parentId: this.$props.parentId});
 
             this.$refs.form.reset();
         },

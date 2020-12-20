@@ -4,7 +4,8 @@ import ProjectModel from "@/domain/ProjectModel"
 
 // initial state
 const state = () => ({
-    all: []
+    all: [],
+    fetched: false
 });
 
 // getters
@@ -12,6 +13,11 @@ const getters = {
     getProjects(state){
         Vue.$log.debug("getProjects");
         return state.all;
+    },
+    getProjectsNameList(state){
+        let names = [];
+        state.all.forEach(item => names.push(item.name));
+        return names;
     },
     getProjectById: state => (id) => {
         Vue.$log.debug("getProjectById");
@@ -27,26 +33,34 @@ const getters = {
         })
         return rootProjects;
     },
-    getProjectAllSubprojectsRecursively: (state, getters) => id => {
+    getParent: state => id => {
+        return state.all.find(item => item.subprojectIds.includes(id));
+    },
+    getAllSubprojectsRecursively: (state, getters) => id => {
         let ids = [];
         let rootProject = getters.getProjectById(id);
         ids = ids.concat(rootProject.id);
         rootProject.subprojectIds.forEach(subprojectId => {
-            ids = ids.concat(getters.getProjectAllSubprojectsRecursively(subprojectId));
+            ids = ids.concat(getters.getAllSubprojectsRecursively(subprojectId));
         });
         return ids;
+    },
+    fetched(state){
+        return state.fetched;
     }
+
 }
 
 const actions = {
     getProjects({commit}){
         Vue.$log.debug(`action:getProjects`);
-        projectsApi.getProjects()
+        return projectsApi.getProjects()
             .then(data => {
                 let projects = [];
                 data.forEach(i => projects.push(new ProjectModel(i)));
                 commit("setProjects", projects);
                 Vue.$log.debug(projects);
+                commit("fetched", true);
             })
             .catch(err => Vue.$log.error(err));
     },
@@ -94,7 +108,7 @@ const actions = {
             dispatch("updateProject", parentProjectDeepCopy)
         }
 
-        let ids = getters.getProjectAllSubprojectsRecursively(id);
+        let ids = getters.getAllSubprojectsRecursively(id);
         Vue.$log.debug(`deleteProjectWithDependencies: ids=${ids}`);
         dispatch("deleteProjects", ids);
     },
@@ -126,6 +140,9 @@ const mutations = {
             project,
             ...state.all.slice(index + 1)
         ]
+    },
+    fetched(state, value){
+        state.fetched = value;
     }
 };
 

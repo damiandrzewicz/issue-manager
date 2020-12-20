@@ -61,7 +61,7 @@ export default {
       let project = new ProjectModel(this.$props.project);
       project.name = this.name;
       project.description = this.description;
-      this.$store.dispatch("projects/updateProject", project);
+      this.$store.dispatch("projectStore/updateProject", project);
       this.showDialog = false;
     },
     onCancel(){
