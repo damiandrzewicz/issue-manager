@@ -11,7 +11,7 @@
             <v-col md="3" xl="3">
               <ProjectTree/>
             </v-col>
-            <v-col md="9" xl="9">
+            <v-col md="9" xl="9" v-if="taskStoreFetched">
               <TasksTree/>
             </v-col>
           </v-row>
@@ -40,6 +40,9 @@ export default {
   computed: {
     ...mapGetters("projectStore", {
         projectStoreFetched: "fetched"
+    }),
+    ...mapGetters("taskStore", {
+        taskStoreFetched: "fetched"
     }),
     
   },

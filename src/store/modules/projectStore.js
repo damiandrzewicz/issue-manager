@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import projectsApi from "@/api/projects.js"
+import projectApi from "@/api/project.js"
 import ProjectModel from "@/domain/ProjectModel"
 
 // initial state
@@ -54,7 +54,7 @@ const getters = {
 const actions = {
     getProjects({commit}){
         Vue.$log.debug(`action:getProjects`);
-        return projectsApi.getProjects()
+        return projectApi.getProjects()
             .then(data => {
                 let projects = [];
                 data.forEach(i => projects.push(new ProjectModel(i)));
@@ -67,7 +67,7 @@ const actions = {
     addProject({commit, dispatch, getters}, payload){
         Vue.$log.debug(`addProject: payload=${JSON.stringify(payload)}`);
         payload.project.created = new Date();
-        projectsApi.addProject(payload.project)
+        projectApi.addProject(payload.project)
             .then(data => {
                 let project = new ProjectModel(data);
                 Vue.$log.debug(`new project: ${JSON.stringify(project)}`)
@@ -84,7 +84,7 @@ const actions = {
     },
     deleteProject({commit}, id){
         Vue.$log.debug(`deleteProject: id=${id}`);
-        projectsApi.deleteProject(id)
+        projectApi.deleteProject(id)
             .then( () => {
                 commit("deleteProject", id);
             })
@@ -92,7 +92,7 @@ const actions = {
     },
     deleteProjects({commit}, ids){
         Vue.$log.debug(`deleteProjects: id=${ids}`);
-        projectsApi.deleteProjects(ids)
+        projectApi.deleteProjects(ids)
             .then(() => {
                 ids.forEach(id => commit("deleteProject", id))
             })
@@ -114,7 +114,7 @@ const actions = {
     },
     updateProject({commit}, project){
         Vue.$log.debug(`updateProject: id=${JSON.stringify(project)}`);
-        projectsApi.updateProject(project)
+        projectApi.updateProject(project)
             .then(data => {
                  Vue.$log.debug(`updateProject: data=${JSON.stringify(data)}`)
                 commit("updateProject", new ProjectModel(data));

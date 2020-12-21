@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Database from "@/api/database"
 
-class ProjectsAPI extends Database{
+class ProjectAPI extends Database{
 
     async getProjects(){
         return axios.get(`${this._uri}/${this._projectsCollectionName}`)
@@ -34,4 +34,4 @@ class ProjectsAPI extends Database{
     }
 }
 
-export default new ProjectsAPI();
+export default new ProjectAPI();

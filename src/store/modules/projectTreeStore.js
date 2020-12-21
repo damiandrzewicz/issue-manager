@@ -41,7 +41,15 @@ const getters = {
 const actions = {
     updateSelectedIds({ commit }, ids){
         commit("updateSelectedIds", ids)
+    },
+
+    selectAll({commit, rootGetters}){
+        let projects = rootGetters["projectStore/getProjects"];
+        let ids =[];
+        projects.forEach(p => ids.push(p.id));
+        commit("updateSelectedIds", ids);
     }
+    
 }
 
 const mutations = {

@@ -39,7 +39,14 @@ export default {
   },
   mounted(){
     this.$store.dispatch("projectStore/getProjects")
-      .then(() => this.$log.debug("data fetched"));
+      .then(() => {
+        this.$log.debug("data fetched");
+        this.$store.dispatch("projectTreeStore/selectAll");
+        });
+
+    
+
+    this.$store.dispatch("taskStore/getTasks")
   },
   created() {
     this.$log.info('App created')

@@ -1,6 +1,6 @@
 <template>
     <v-card>
-        <v-treeview @input="setSelectedIds" :value="getSelectedIds" :items="getProjectTree" item-children="subprojects" selectable open-all>
+        <v-treeview @input="setSelectedIds" :value="getSelectedIds" :items="getProjectTree" item-children="subprojects" selectable open-all selection-type="independent">
 
         </v-treeview>
     </v-card>

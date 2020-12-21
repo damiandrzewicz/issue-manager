@@ -13,15 +13,21 @@
             <v-form ref="form" lazy-validation>
               <v-row>
               <v-col>
-                <v-text-field label="Name" prepend-icon="mdi-folder" v-model="task.name" :rules="nameRules"></v-text-field>
-                <v-textarea class="my-3" label="Description" height="80" prepend-icon="mdi-pen" :rules="descriptionRules" v-model="task.description"></v-textarea>
-                <v-text-field label="URL" prepend-icon="mdi-link" :rules="urlRules" v-model="task.externalUrl"></v-text-field >
-                <v-text-field v-show="task.externalUrl" label="URL short name" prepend-icon="mdi-link" v-model="task.externalUrlShortcut"></v-text-field>
-                <v-combobox label="Project" :items="getProjectsNameList" prepend-icon="mdi-book-open-blank-variant" :rules="projectRules" v-model="task.project"></v-combobox>
+                <v-text-field label="Name" prepend-icon="mdi-folder" v-model="tempTask.name" :rules="nameRules"></v-text-field>
+                <v-textarea class="my-3" label="Description" height="80" prepend-icon="mdi-pen" :rules="descriptionRules" v-model="tempTask.description"></v-textarea>
+                <v-row>
+                  <v-col>
+                    <v-text-field label="URL" prepend-icon="mdi-link" :rules="urlRules" v-model="tempTask.externalUrl"></v-text-field >
+                  </v-col>
+                  <v-col v-show="tempTask.externalUrl" sm="4">
+                    <v-text-field  label="URL short name" prepend-icon="mdi-link" v-model="tempTask.externalUrlShortcut"></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-combobox label="Project" :items="getProjectsNameList" prepend-icon="mdi-book-open-blank-variant" :rules="projectRules" v-model="projectName"></v-combobox>
                   <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="290px">
                     <template v-slot:activator="{ on, attrs }">
                       <v-text-field
-                        v-model="task.deadline"
+                        v-model="tempTask.deadline"
                         label="Deadline"
                         prepend-icon="mdi-calendar"
                         readonly
@@ -30,7 +36,7 @@
                       ></v-text-field>
                     </template>
                     <v-date-picker
-                      v-model="task.deadline"
+                      v-model="tempTask.deadline"
                       @input="menu = false"
                       :allowed-dates="allowedDates"
                     ></v-date-picker>
@@ -47,7 +53,7 @@
                       </template>
                   </v-combobox>
 
-                  <v-text-field v-model="task.estimatedPoodoro" type="number" prepend-icon="mdi-timer" label="Estimated pomodoro sessions" min=1 max=100 :rules="[estimatedPomodoroRules]"
+                  <v-text-field v-model="tempTask.estimatedPoodoro" type="number" prepend-icon="mdi-timer" label="Estimated pomodoro sessions" min=1 max=100 :rules="[estimatedPomodoroRules]"
                     @oninput="obj => {if(Number(obj.value) > Number(obj.max)) obj.value = obj.max;}"/>
               </v-col>
             </v-row>
@@ -66,22 +72,30 @@
 <script>
 import { mapGetters } from 'vuex'
 import TaskModel from "@/domain/TaskModel"
-// import TaskPriority from "@/domain/TaskPriorityModel"
+import TaskPriority from "@/domain/TaskPriorityModel"
 
 export default {
-  name: "EditProjectDialog",
+  name: "AddTaskDialog",
   props: {
     show: {
       type: Boolean
     },
+    task: {
+      type: TaskModel,
+      default: null
+    }
+  },
+  created(){
+    
   },
   data(){
     return{
       menu: false,
 
       // Model
-      task: new TaskModel(),
+      tempTask: this.$props.task ? this.$props.task.deepCopy() : new TaskModel(),
       priorityHelper: { text: "No", color: 'grey'},
+      projectName: "",
 
       // Validation rules
       nameRules: [ v => !!v || 'Name is required'],
@@ -97,7 +111,8 @@ export default {
   },
   computed: {
     ...mapGetters("projectStore", [
-            "getProjectsNameList"
+            "getProjectsNameList",
+            "getProjects"
     ]),
     showDialog: {
       get() {
@@ -118,6 +133,13 @@ export default {
         return;
 
       console.log("validated");
+
+      this.tempTask.priority = TaskPriority.fromString(this.priorityHelper);
+      this.tempTask.projectId = this.getProjects.find(p => p.name === this.projectName).id;
+
+      console.log(this.tempTask);
+
+      this.$store.dispatch("taskStore/addTask", {task: this.tempTask});
 
       this.resetForm();
       this.$refs.form.resetValidation();
@@ -148,8 +170,9 @@ export default {
       return selectedDate >= nowDate;
       },
       resetForm(){
-        this.task = new TaskModel();
+        this.tempTask = new TaskModel();
         this.priorityHelper = { text: "No", color: 'grey'};
+        this.projectName = ""
       }
   }
 }
